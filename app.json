@@ -1,37 +1,48 @@
 {
-  "expo": {
-    "name": "cqc-cgds",
-    "slug": "cqc-cgds",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    }
-  }
+	"expo": {
+		"name": "ExpoSupabaseGluetstackStarter",
+		"slug": "ExpoSupabaseGluetstackStarter",
+		"scheme": "expo-supabase-gluestack-starter",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/images/icon.png",
+		"userInterfaceStyle": "automatic",
+		"assetBundlePatterns": ["**/*"],
+		"newArchEnabled": true,
+		"ios": {
+			"supportsTablet": true,
+			"config": {
+				"usesNonExemptEncryption": false
+			},
+			"splash": {
+				"image": "./assets/images/splash.png",
+				"resizeMode": "cover",
+				"backgroundColor": "#ffffff",
+				"dark": {
+					"backgroundColor": "#000000",
+					"resizeMode": "cover",
+					"image": "./assets/images/splash-dark.png"
+				}
+			}
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/adaptive-icon.png"
+			},
+			"splash": {
+				"image": "./assets/images/splash.png",
+				"resizeMode": "cover",
+				"backgroundColor": "#ffffff",
+				"dark": {
+					"backgroundColor": "#000000",
+					"resizeMode": "cover",
+					"image": "./assets/images/splash-dark.png"
+				}
+			}
+		},
+		"experiments": {
+			"typedRoutes": true
+		},
+		"plugins": ["expo-router"]
+	}
 }
