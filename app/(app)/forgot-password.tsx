@@ -1,4 +1,3 @@
-import { Toast, ToastTitle, useToast } from "@/components/ui/toast"
 import { VStack } from "@/components/ui/vstack"
 import { Heading } from "@/components/ui/heading"
 import { Text } from "@/components/ui/text"
@@ -18,6 +17,10 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertTriangle } from "lucide-react-native"
 import { AuthLayout } from "@/components/AuthLayout"
+import { Card } from "@/components/ui/card"
+import { useState } from "react"
+import { useSupabase } from "@/context/supabase-provider"
+import { Spinner } from "@/components/ui/spinner"
 
 const forgotPasswordSchema = z.object({
 	email: z.string().min(1, "Email is required").email(),
@@ -26,46 +29,46 @@ const forgotPasswordSchema = z.object({
 type forgotPasswordSchemaType = z.infer<typeof forgotPasswordSchema>
 
 const ForgotPasswordScreen = () => {
+	const { forgotPassword } = useSupabase()
 	const {
 		control,
 		handleSubmit,
 		reset,
-		formState: { errors },
+		formState: { isSubmitting, errors },
 	} = useForm<forgotPasswordSchemaType>({
 		resolver: zodResolver(forgotPasswordSchema),
 	})
-	const toast = useToast()
+	const [resetSuccess, setResetSucess] = useState(false)
 
-	const onSubmit = (_data: forgotPasswordSchemaType) => {
-		toast.show({
-			placement: "bottom right",
-			render: ({ id }) => {
-				return (
-					<Toast nativeID={id} variant="solid" action="success">
-						<ToastTitle>Link Sent Successfully</ToastTitle>
-					</Toast>
-				)
-			},
-		})
-		reset()
+	const onReset = async (data: forgotPasswordSchemaType) => {
+		try {
+			await forgotPassword(data.email)
+			reset()
+			setResetSucess(true)
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	const handleKeyPress = () => {
 		Keyboard.dismiss()
-		handleSubmit(onSubmit)()
+		handleSubmit(onReset)()
 	}
 
 	return (
 		<VStack className="max-w-[440px] w-full" space="md">
-				<VStack>
-					<Heading className="md:text-center" size="3xl">
-						Forgot Password?
-					</Heading>
-					<Text className="text-sm">
-						Enter email ID associated with your account.
-					</Text>
-				</VStack>
+			<VStack>
+				<Heading className="md:text-center mb-3" size="3xl">
+					Forgot Password?
+				</Heading>
+				<Text className="text-sm md:text-center mb-3">Enter email ID associated with your account.</Text>
+			</VStack>
 			<VStack space="xl" className="w-full ">
+				{resetSuccess && (
+					<Card size="sm" variant="filled" className="bg-success-50 border-2 border-success-300">
+						<Text className="text-center text-primary-950">Check your inbox for reset link</Text>
+					</Card>
+				)}
 				<FormControl isInvalid={!!errors?.email} className="w-full">
 					<FormControlLabel>
 						<FormControlLabelText>Email</FormControlLabelText>
@@ -99,13 +102,11 @@ const ForgotPasswordScreen = () => {
 					/>
 					<FormControlError>
 						<FormControlErrorIcon as={AlertTriangle} />
-						<FormControlErrorText>
-							{errors?.email?.message}
-						</FormControlErrorText>
+						<FormControlErrorText>{errors?.email?.message}</FormControlErrorText>
 					</FormControlError>
 				</FormControl>
-				<Button className="w-full" onPress={handleSubmit(onSubmit)}>
-					<ButtonText className="font-medium">Send Link</ButtonText>
+				<Button className="w-full" disabled={isSubmitting} onPress={handleSubmit(onReset)}>
+					{isSubmitting ? <Spinner /> : <ButtonText className="font-medium">Send Link</ButtonText>}
 				</Button>
 			</VStack>
 		</VStack>

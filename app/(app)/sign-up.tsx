@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { Toast, ToastTitle, useToast } from "@/components/ui/toast"
 import { HStack } from "@/components/ui/hstack"
 import { VStack } from "@/components/ui/vstack"
 import { Heading } from "@/components/ui/heading"
@@ -15,17 +14,8 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control"
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input"
-import {
-	Checkbox,
-	CheckboxIcon,
-	CheckboxIndicator,
-	CheckboxLabel,
-} from "@/components/ui/checkbox"
-import {
-	CheckIcon,
-	EyeIcon,
-	EyeOffIcon,
-} from "@/components/ui/icon"
+import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from "@/components/ui/checkbox"
+import { CheckIcon, EyeIcon, EyeOffIcon } from "@/components/ui/icon"
 import { Button, ButtonText, ButtonIcon } from "@/components/ui/button"
 import { Keyboard } from "react-native"
 import { useForm, Controller } from "react-hook-form"
@@ -34,100 +24,107 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertTriangle } from "lucide-react-native"
 import { GoogleIcon } from "@/assets/icons/google"
 import { AuthLayout } from "@/components/AuthLayout"
+import { Spinner } from "@/components/ui/spinner"
+import { Card } from "@/components/ui/card"
+import { useSupabase } from "@/context/supabase-provider"
 
-const signUpSchema = z.object({
-	email: z.string().min(1, "Email is required").email(),
-	password: z
-		.string()
-		.min(6, "Must be at least 8 characters in length")
-		.regex(new RegExp(".*[A-Z].*"), "One uppercase character")
-		.regex(new RegExp(".*[a-z].*"), "One lowercase character")
-		.regex(new RegExp(".*\\d.*"), "One number")
-		.regex(
-			new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"),
-			"One special character",
-		),
-	confirmpassword: z
-		.string()
-		.min(6, "Must be at least 8 characters in length")
-		.regex(new RegExp(".*[A-Z].*"), "One uppercase character")
-		.regex(new RegExp(".*[a-z].*"), "One lowercase character")
-		.regex(new RegExp(".*\\d.*"), "One number")
-		.regex(
-			new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"),
-			"One special character",
-		),
-	rememberme: z.boolean().optional(),
-})
-type SignUpSchemaType = z.infer<typeof signUpSchema>
+const signUpSchema = z
+	.object({
+		email: z.string().min(1, "Email is required").email(),
+		password: z
+			.string()
+			.min(8, "Must be at least 8 characters")
+			.max(64, "Must be less than 64 characters")
+			.regex(new RegExp(".*[A-Z].*"), "One uppercase character required")
+			.regex(new RegExp(".*[a-z].*"), "One lowercase character required")
+			.regex(new RegExp(".*\\d.*"), "One number required")
+			.regex(new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"), "One special character required"),
+		confirmpassword: z
+			.string()
+			.min(8, "Must be at least 8 characters in length")
+			.max(64, "Must be less than 64 characters")
+			.regex(new RegExp(".*[A-Z].*"), "One uppercase character")
+			.regex(new RegExp(".*[a-z].*"), "One lowercase character")
+			.regex(new RegExp(".*\\d.*"), "One number")
+			.regex(new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"), "One special character"),
+		terms: z.boolean(),
+	})
+	.refine((data) => data.password === data.confirmpassword, {
+		message: "Your passwords do not match.",
+		path: ["matchPasswords"],
+	})
+	.refine((data) => data.terms === true, {
+		message: "Acceptance of terms is required",
+		path: ["acceptTerms"],
+	})
+type SignUpSchemaType = z.infer<typeof signUpSchema> & {
+	matchPasswords?: {
+		message: string
+	}
+	acceptTerms?: {
+		message: string
+	}
+}
 
 const SignUpWithLeftBackground = () => {
+	const { signUp } = useSupabase()
 	const {
 		control,
 		handleSubmit,
 		reset,
-		formState: { errors },
+		trigger,
+		formState: { isSubmitting, errors },
 	} = useForm<SignUpSchemaType>({
 		resolver: zodResolver(signUpSchema),
 	})
-	const toast = useToast()
-
-	const onSubmit = (data: SignUpSchemaType) => {
-		if (data.password === data.confirmpassword) {
-			toast.show({
-				placement: "bottom right",
-				render: ({ id }) => {
-					return (
-						<Toast nativeID={id} variant="solid" action="success">
-							<ToastTitle>Success</ToastTitle>
-						</Toast>
-					)
-				},
-			})
-			reset()
-		} else {
-			toast.show({
-				placement: "bottom right",
-				render: ({ id }) => {
-					return (
-						<Toast nativeID={id} variant="solid" action="error">
-							<ToastTitle>Passwords do not match</ToastTitle>
-						</Toast>
-					)
-				},
-			})
-		}
-	}
 	const [showPassword, setShowPassword] = useState(false)
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+	const [signUpSuccess, setSignUpSuccess] = useState(false)
 
-	const handleState = () => {
-		setShowPassword((showState) => {
-			return !showState
-		})
+	const onSignUp = async (data: SignUpSchemaType) => {
+		try {
+			await signUp(data.email, data.password)
+			reset()
+			setSignUpSuccess(true)
+		} catch (error) {
+			console.error(error)
+		}
 	}
-	const handleConfirmPwState = () => {
-		setShowConfirmPassword((showState) => {
-			return !showState
-		})
+
+	const toggleShowPassword = () => {
+		setShowPassword(!showPassword)
 	}
+
+	const toggleShowConfirmPassword = () => {
+		setShowConfirmPassword(!showConfirmPassword)
+	}
+
 	const handleKeyPress = () => {
 		Keyboard.dismiss()
-		handleSubmit(onSubmit)()
+		handleSubmit(onSignUp)()
 	}
 
 	return (
 		<VStack className="max-w-[440px] w-full" space="md">
-
-				<VStack>
-					<Heading className="md:text-center" size="3xl">
-						Sign up
-					</Heading>
-					<Text>Sign up and start using gluestack</Text>
-				</VStack>
+			<VStack>
+				<Heading className="md:text-center mb-3" size="3xl">
+					Sign up
+				</Heading>
+				<Text className="md:text-center mb-3">Sign up and start using this app</Text>
+			</VStack>
 
 			<VStack className="w-full">
 				<VStack space="xl" className="w-full">
+					{errors.matchPasswords && (
+						<Card size="sm" variant="filled" className="bg-error-50 border-2 border-error-300">
+							<Text className="text-center text-primary-950">Passwords don't match</Text>
+						</Card>
+					)}
+					{signUpSuccess && (
+						<Card size="sm" variant="filled" className="bg-success-50 border-2 border-success-300">
+							<Text className="text-center text-primary-950">Check your inbox to complete sign-up</Text>
+						</Card>
+					)}
 					<FormControl isInvalid={!!errors.email}>
 						<FormControlLabel>
 							<FormControlLabelText>Email</FormControlLabelText>
@@ -163,9 +160,7 @@ const SignUpWithLeftBackground = () => {
 						/>
 						<FormControlError>
 							<FormControlErrorIcon size="md" as={AlertTriangle} />
-							<FormControlErrorText>
-								{errors?.email?.message}
-							</FormControlErrorText>
+							<FormControlErrorText>{errors?.email?.message}</FormControlErrorText>
 						</FormControlError>
 					</FormControl>
 					<FormControl isInvalid={!!errors.password}>
@@ -200,7 +195,7 @@ const SignUpWithLeftBackground = () => {
 										returnKeyType="done"
 										type={showPassword ? "text" : "password"}
 									/>
-									<InputSlot onPress={handleState} className="pr-3">
+									<InputSlot onPress={toggleShowPassword} className="pr-3">
 										<InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
 									</InputSlot>
 								</Input>
@@ -208,9 +203,7 @@ const SignUpWithLeftBackground = () => {
 						/>
 						<FormControlError>
 							<FormControlErrorIcon size="sm" as={AlertTriangle} />
-							<FormControlErrorText>
-								{errors?.password?.message}
-							</FormControlErrorText>
+							<FormControlErrorText>{errors?.password?.message}</FormControlErrorText>
 						</FormControlError>
 					</FormControl>
 					<FormControl isInvalid={!!errors.confirmpassword}>
@@ -246,58 +239,59 @@ const SignUpWithLeftBackground = () => {
 										type={showConfirmPassword ? "text" : "password"}
 									/>
 
-									<InputSlot onPress={handleConfirmPwState} className="pr-3">
-										<InputIcon
-											as={showConfirmPassword ? EyeIcon : EyeOffIcon}
-										/>
+									<InputSlot onPress={toggleShowConfirmPassword} className="pr-3">
+										<InputIcon as={showConfirmPassword ? EyeIcon : EyeOffIcon} />
 									</InputSlot>
 								</Input>
 							)}
 						/>
 						<FormControlError>
 							<FormControlErrorIcon size="sm" as={AlertTriangle} />
-							<FormControlErrorText>
-								{errors?.confirmpassword?.message}
-							</FormControlErrorText>
+							<FormControlErrorText>{errors?.confirmpassword?.message}</FormControlErrorText>
 						</FormControlError>
 					</FormControl>
-
-					<Controller
-						name="rememberme"
-						defaultValue={false}
-						control={control}
-						render={({ field: { onChange, value } }) => (
-							<Checkbox
-								size="sm"
-								value="Remember me"
-								isChecked={value}
-								onChange={onChange}
-								aria-label="Remember me"
-							>
-								<CheckboxIndicator>
-									<CheckboxIcon as={CheckIcon} />
-								</CheckboxIndicator>
-								<CheckboxLabel>
-									I accept the Terms of Use & Privacy Policy
-								</CheckboxLabel>
-							</Checkbox>
-						)}
-					/>
+					<FormControl isInvalid={!!errors.acceptTerms}>
+						<Controller
+							name="terms"
+							defaultValue={false}
+							control={control}
+							render={({ field: { onChange, value } }) => (
+								<Checkbox
+									size="sm"
+									value="Terms"
+									isChecked={value}
+									onChange={(checked) => {
+										onChange(checked, { shouldValidate: true })
+										trigger("acceptTerms")
+									}}
+									aria-label="Terms of use"
+								>
+									<CheckboxIndicator>
+										<CheckboxIcon as={CheckIcon} />
+									</CheckboxIndicator>
+									<CheckboxLabel>I accept the Terms of Use & Privacy Policy</CheckboxLabel>
+								</Checkbox>
+							)}
+						/>
+						<FormControlError>
+							<FormControlErrorIcon size="sm" as={AlertTriangle} />
+							<FormControlErrorText>{`${errors?.acceptTerms?.message}`}</FormControlErrorText>
+						</FormControlError>
+					</FormControl>
 				</VStack>
 
 				<VStack className="w-full my-7" space="lg">
-					<Button className="w-full" onPress={handleSubmit(onSubmit)}>
-						<ButtonText className="font-medium">Sign up</ButtonText>
+					<Button className="w-full" disabled={isSubmitting} onPress={handleSubmit(onSignUp)}>
+						{isSubmitting ? <Spinner /> : <ButtonText className="font-medium">Sign up</ButtonText>}
 					</Button>
 					<Button
 						variant="outline"
 						action="secondary"
 						className="w-full gap-1"
+						disabled={isSubmitting}
 						onPress={() => {}}
 					>
-						<ButtonText className="font-medium">
-							Continue with Google
-						</ButtonText>
+						<ButtonText className="font-medium">Continue with Google</ButtonText>
 						<ButtonIcon as={GoogleIcon} />
 					</Button>
 				</VStack>
@@ -308,7 +302,7 @@ const SignUpWithLeftBackground = () => {
 							className="font-medium text-primary-700 group-hover/link:text-primary-600 group-hover/pressed:text-primary-700"
 							size="md"
 						>
-							Login
+							Sign in
 						</LinkText>
 					</Link>
 				</HStack>

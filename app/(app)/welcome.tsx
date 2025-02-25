@@ -1,51 +1,46 @@
-import { useRouter } from "expo-router"
-import React from "react"
-import { View } from "react-native"
+import { VStack } from "@/components/ui/vstack"
+import { Button, ButtonText } from "@/components/ui/button"
+import { Icon } from "@/components/ui/icon"
+import { GluestackIcon, GluestackIconDark } from "@/assets/icons/gluestack-icon"
+import { useColorScheme } from "@/components/useColorScheme"
+import { router } from "expo-router"
+import { AuthLayout } from "@/components/AuthLayout"
 
-import { Image } from "expo-image"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Button } from "@/components/ui/button"
-import { Text } from "@/components/ui/text"
-import { Heading } from "@/components/ui/heading"
-
-export default function WelcomeScreen() {
-	const router = useRouter()
+const SplashScreenWithLeftBackground = () => {
+	const { colorScheme } = useColorScheme()
 
 	return (
-		<SafeAreaView className="flex flex-1 bg-background p-4">
-			<View className="flex flex-1 items-center justify-center gap-y-4 web:m-4 ">
-				<Image
-					source={require("@/assets/images/icon.png")}
-					className="w-16 h-16 rounded-xl"
-				/>
-				<Heading className="text-center">
-					Welcome to Expo Supabase Starter
-				</Heading>
-				<Text className="text-center">
-					A comprehensive starter project for developing React Native and Expo
-					applications with Supabase as the backend.
-				</Text>
-			</View>
-			<View className="flex flex-col gap-y-4 web:m-4">
+		<VStack className="w-full max-w-[440px] items-center h-full justify-center" space="lg">
+			{colorScheme === "dark" ? (
+				<Icon as={GluestackIconDark} className="w-[219px] h-10" />
+			) : (
+				<Icon as={GluestackIcon} className="w-[219px] h-10" />
+			)}
+			<VStack className="w-full" space="lg">
 				<Button
-					size="md"
-					variant="solid"
-					onPress={() => {
-						router.push("/sign-up")
-					}}
-				>
-					<Text className="text-white">Sign Up</Text>
-				</Button>
-				<Button
-					size="md"
-					variant="solid"
+					className="w-full"
 					onPress={() => {
 						router.push("/sign-in")
 					}}
 				>
-					<Text className="text-white">Sign In</Text>
+					<ButtonText className="font-medium">Log in</ButtonText>
 				</Button>
-			</View>
-		</SafeAreaView>
+				<Button
+					onPress={() => {
+						router.push("/sign-up")
+					}}
+				>
+					<ButtonText className="font-medium">Sign Up</ButtonText>
+				</Button>
+			</VStack>
+		</VStack>
+	)
+}
+
+export default function SplashScreen() {
+	return (
+		<AuthLayout>
+			<SplashScreenWithLeftBackground />
+		</AuthLayout>
 	)
 }
