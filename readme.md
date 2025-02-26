@@ -25,7 +25,7 @@ A complete authentication flow was written, including protecting routes and forg
 4. Then add your EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY to a .env file
 5. Check and update the dependencies with `npx expo install --check`
 
-### Disclaimer
+## Disclaimer
 
 I made this for my personal use and cannot guarantee its integrity.
 

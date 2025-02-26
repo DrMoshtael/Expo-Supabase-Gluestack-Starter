@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form-control"
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input"
 import { EyeIcon, EyeOffIcon } from "@/components/ui/icon"
-import { Button, ButtonText, ButtonIcon } from "@/components/ui/button"
+import { Button, ButtonText, ButtonIcon, ButtonSpinner } from "@/components/ui/button"
 import { Keyboard } from "react-native"
 import { useForm, Controller } from "react-hook-form"
 import { z } from "zod"
@@ -24,7 +24,6 @@ import { AlertTriangle } from "lucide-react-native"
 import { GoogleIcon } from "@/assets/icons/google"
 import { AuthLayout } from "../../components/AuthLayout"
 import { useSupabase } from "@/context/supabase-provider"
-import { Spinner } from "@/components/ui/spinner"
 import { Card } from "@/components/ui/card"
 
 const loginSchema = z.object({
@@ -166,7 +165,7 @@ const LoginWithLeftBackground = () => {
 				</VStack>
 				<VStack className="w-full my-7 " space="lg">
 					<Button className="w-full" disabled={isSubmitting} onPress={handleSubmit(signInWithEmail)}>
-						{isSubmitting ? <Spinner /> : <ButtonText className="font-medium">Log in</ButtonText>}
+						{isSubmitting ? <ButtonSpinner /> : <ButtonText className="font-medium">Log in</ButtonText>}
 					</Button>
 					<Button
 						variant="outline"
