@@ -44,12 +44,6 @@ export default function RootLayout() {
 
 	if (!loaded) {
 		return null
-	} 
-
-	//Make sure we don't get stuck on the welcome page if we're logged in
-	const inWelcomePage = segments[1] === "welcome"
-	if (session && inWelcomePage) {
-		return <Redirect href="/(app)/(protected)" />
 	}
 
 	//Make sure we don't get stuck on the welcome page if we're logged in
