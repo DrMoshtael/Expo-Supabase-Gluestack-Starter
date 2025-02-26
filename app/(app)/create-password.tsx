@@ -109,7 +109,9 @@ const CreatePasswordWithLeftBackground = () => {
 					)}
 					{updateSucess && (
 						<Card size="sm" variant="filled" className="bg-success-50 border-2 border-success-300">
-							<Text className="text-center text-primary-950">Password updated. You can now access your <Link href="/(app)/(protected)" asChild>
+							<Text className="text-center text-primary-950">
+								Password updated. You can now access your{" "}
+								<Link href="/(app)/(protected)" asChild>
 									<LinkText
 										className="text-primary-950 hover:text-blue-800 group-hover/pressed:text-primary-700"
 										size="md"

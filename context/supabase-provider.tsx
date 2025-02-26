@@ -42,14 +42,16 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
 	useEffect(() => {
 		const getSession = async () => {
-			await supabase.auth.refreshSession();
-			const { data: { session } } = await supabase.auth.getSession();
-			setSession(session);
-			setUser(session?.user || null);
-			setInitialized(true);
-		  };
-		
-		  getSession();
+			await supabase.auth.refreshSession()
+			const {
+				data: { session },
+			} = await supabase.auth.getSession()
+			setSession(session)
+			setUser(session?.user || null)
+			setInitialized(true)
+		}
+
+		getSession()
 
 		const { data } = supabase.auth.onAuthStateChange((event, session) => {
 			setSession(session)
@@ -62,7 +64,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		return () => {
 			data?.subscription?.unsubscribe()
 		}
-	}, [])
+	}, [router])
 
 	const signUp = async (email: string, password: string) => {
 		const { error } = await supabase.auth.signUp({

@@ -9,7 +9,6 @@ import { AuthLayout } from "@/components/AuthLayout"
 const SplashScreenWithLeftBackground = () => {
 	const { colorScheme } = useColorScheme()
 
-
 	return (
 		<VStack className="w-full max-w-[440px] items-center h-full justify-center" space="lg">
 			{colorScheme === "dark" ? (

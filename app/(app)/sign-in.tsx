@@ -14,8 +14,7 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control"
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input"
-// import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from "@/components/ui/checkbox"
-import { CheckIcon, EyeIcon, EyeOffIcon } from "@/components/ui/icon"
+import { EyeIcon, EyeOffIcon } from "@/components/ui/icon"
 import { Button, ButtonText, ButtonIcon } from "@/components/ui/button"
 import { Keyboard } from "react-native"
 import { useForm, Controller } from "react-hook-form"
@@ -55,6 +54,7 @@ const LoginWithLeftBackground = () => {
 			await signInWithPassword(data.email, data.password)
 			reset()
 		} catch (error) {
+			console.error(error)
 			setValidated(false)
 		}
 	}
@@ -72,9 +72,9 @@ const LoginWithLeftBackground = () => {
 		<VStack className="max-w-[440px] w-full" space="md">
 			<VStack>
 				<Heading className="md:text-center mb-3" size="3xl">
-					Log in
+					Sign in
 				</Heading>
-				<Text className="md:text-center mb-3">Login to start using this app</Text>
+				<Text className="md:text-center mb-3">Sign in to start using this app</Text>
 			</VStack>
 			<VStack className="w-full">
 				<VStack space="xl" className="w-full">
@@ -160,26 +160,9 @@ const LoginWithLeftBackground = () => {
 							<FormControlErrorText>{errors?.password?.message}</FormControlErrorText>
 						</FormControlError>
 					</FormControl>
-					{/* <HStack className="w-full justify-between "> */}
-					{/* <Controller
-							name="rememberme"
-							defaultValue={false}
-							control={control}
-							render={({ field: { onChange, value } }) => (
-								<Checkbox size="sm" value="Remember me" isChecked={value} onChange={onChange} aria-label="Remember me">
-									<CheckboxIndicator>
-										<CheckboxIcon as={CheckIcon} />
-									</CheckboxIndicator>
-									<CheckboxLabel>Remember me</CheckboxLabel>
-								</Checkbox>
-							)}
-						/> */}
 					<Link href="/forgot-password" asChild>
-						<LinkText className="font-medium text-sm text-primary-700 hover:text-blue-800">
-							Forgot Password?
-						</LinkText>
+						<LinkText className="font-medium text-sm text-primary-700 hover:text-blue-800">Forgot Password?</LinkText>
 					</Link>
-					{/* </HStack> */}
 				</VStack>
 				<VStack className="w-full my-7 " space="lg">
 					<Button className="w-full" disabled={isSubmitting} onPress={handleSubmit(signInWithEmail)}>
@@ -198,7 +181,7 @@ const LoginWithLeftBackground = () => {
 				</VStack>
 				<HStack className="self-center" space="sm">
 					<Text size="md">Don't have an account?</Text>
-					<Link href="/sign-up">
+					<Link href="/sign-up" asChild>
 						<LinkText
 							className="font-medium text-primary-700 hover:text-blue-800  group-hover/pressed:text-primary-700"
 							size="md"

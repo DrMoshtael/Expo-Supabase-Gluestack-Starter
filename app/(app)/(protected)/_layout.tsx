@@ -1,4 +1,4 @@
-import { Tabs, Redirect, useSegments, SplashScreen, router } from "expo-router"
+import { Tabs, Redirect, useSegments, SplashScreen } from "expo-router"
 import React from "react"
 import { useColorScheme } from "@/components/useColorScheme"
 import { useSupabase } from "@/context/supabase-provider"
@@ -10,11 +10,11 @@ import { Icon } from "@/components/ui/icon"
 export default function ProtectedLayout() {
 	const { session, initialized } = useSupabase()
 	const segments = useSegments()
-	const { colorScheme, toggleColorScheme } = useColorScheme()
+	const { toggleColorScheme } = useColorScheme()
 
 	if (!initialized) {
-		SplashScreen.preventAutoHideAsync();
-		return null; // Render nothing while loading (keeps splash screen visible)
+		SplashScreen.preventAutoHideAsync()
+		return null // Render nothing while loading (keeps splash screen visible)
 	}
 
 	const inWelcomePage = segments[1] === "welcome"
@@ -41,8 +41,8 @@ export default function ProtectedLayout() {
 				name="index"
 				options={{
 					title: "Home",
-					tabBarIcon: ({ color }) => <Icon as={HomeIcon} size="xl" color={color}/>,
-					tabBarShowLabel: true
+					tabBarIcon: ({ color }) => <Icon as={HomeIcon} size="xl" color={color} />,
+					tabBarShowLabel: true,
 				}}
 			/>
 			<Tabs.Screen
@@ -50,8 +50,9 @@ export default function ProtectedLayout() {
 				options={{
 					title: "Settings",
 					tabBarIcon: ({ color }) => <Icon as={SettingsIcon} size="xl" color={color} />,
-					tabBarShowLabel: true
-				}} />
+					tabBarShowLabel: true,
+				}}
+			/>
 		</Tabs>
 	)
 }

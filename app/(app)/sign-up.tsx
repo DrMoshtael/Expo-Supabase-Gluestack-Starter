@@ -87,7 +87,7 @@ const SignUpWithLeftBackground = () => {
 			reset()
 			setSignUpSuccess(true)
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 		}
 	}
 
@@ -302,7 +302,7 @@ const SignUpWithLeftBackground = () => {
 							className="font-medium text-primary-700 group-hover/link:text-primary-600 group-hover/pressed:text-primary-700"
 							size="md"
 						>
-							Login
+							Sign in
 						</LinkText>
 					</Link>
 				</HStack>

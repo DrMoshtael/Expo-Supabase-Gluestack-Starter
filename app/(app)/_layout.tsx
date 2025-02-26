@@ -52,6 +52,12 @@ export default function RootLayout() {
 		return <Redirect href="/(app)/(protected)" />
 	}
 
+	//Make sure we don't get stuck on the welcome page if we're logged in
+	const inWelcomePage = segments[1] === "welcome"
+	if (session && inWelcomePage) {
+		return <Redirect href="/(app)/(protected)" />
+	}
+
 	return (
 		<GluestackUIProvider mode="system">
 			<RootLayoutNav />

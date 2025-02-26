@@ -23,7 +23,7 @@ A complete authentication flow was written, including protecting routes and forg
 2. Install the dependencies
 3. If you don't have a Supabase project, you can create one for free
 4. Then add your EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY to a .env file
-5. Update the dependencies with `npx expo install --fix`
+5. Check and update the dependencies with `npx expo install --check`
 
 ### Disclaimer
 
