@@ -74,7 +74,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		if (error) {
 			throw error
 		}
-		router.replace("/(app)/(protected)")
 	}
 
 	const signInWithPassword = async (email: string, password: string) => {
